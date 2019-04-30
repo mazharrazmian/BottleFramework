@@ -12,10 +12,17 @@ def send_static(filename):
 def index():
     return template('index')
 
+
+
+"""Ajax requests and from data from index.js will be handled here"""
 @route('/',method='post')
 def filter_data():
+
+  #getting values of form fields from the request
     city = request.POST.get('city')
     city2 = request.POST.get('city2')
+    
+  #requesting the API to fetch data and then storing it, APPID in the url is the API key
     city_url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&units=imperial&APPID=a177cd96746098695c1234fa679d306c'
     r = requests.get(url=city_url)
     city_json=r.json()
@@ -23,19 +30,13 @@ def filter_data():
     req = requests.get(url=city2_url)
     city2_json = req.json()
 
-    """Checking if the API returned a valid response"""
+    """Returning ERROR if the status code is not 200, i.e if the response is invalid"""
     if city_json['cod'] != 200:
-      #print("In the if condition")
-      #print(city_json['cod'],flush=True)
       return city_json
     elif city2_json['cod'] != 200:
-      #print("In elif condition")
-      #print(city2_json['cod'],flush=True)
       return city2_json
 
-    
-    print(city_json['cod'])
-    print(city2_json['cod'])
+    """Filtering the API data and sending the Filtered data to the client side"""
     city_data = {
       'cod': city_json['cod'],
       'name' : city_json['name'],
@@ -66,6 +67,8 @@ def filter_data():
 
 @route('/comments',method='POST')
 def post_comments():
+
+    #getting the name and comment of the user from request
     comment = request.POST.get('comment')
     name = request.POST.get('name')
     #connect the database
@@ -76,7 +79,7 @@ def post_comments():
     context = cur.execute('SELECT * FROM comments')
     return template('comments',context= context)
 
-
+# Display all comments if the user just wants to read them
 @route('/comments',method="GET")
 def get_comments():
     con = sqlite3.connect('data\\comments.dat')
@@ -85,68 +88,54 @@ def get_comments():
     return template('comments',context= context)
 
 
-@route('/forecast',method='post')
+@route('/forecast',method='get')
 def get_forecast():
   return template('forecast')
 
-
-
-"""Function to handle form data entered by the user"""
+        """Function to handle form data entered by the user to forecast"""
 @route('/forecast',method='post')
 def post_forecast():      
+    #requesting the API to fetch data and then storing it, APPID in the url is the API key
     city = request.POST.get('city')
     city2 = request.POST.get('city2')
-    
-    city_url = f'http://openweathermap.org/data/2.5/forecast?q={city}&units=imperial&appid=b6907d289e10d714a6e88b30761fae22'
+    city_url = f'http://api.openweathermap.org/data/2.5/forecast?q={city}&units=imperial&APPID=a177cd96746098695c1234fa679d306c'
     r = requests.get(url=city_url)
     city_json=r.json()
-    #lat = coords_data["coord"]["lat"]
-    #lon = coords_data["coord"]["lon"]
-    
-    #getting data of 10 cities around the one entered by the user
-    city2_url = f'http://openweathermap.org/data/2.5/forecast?q={city2}&units=imperial&appid=b6907d289e10d714a6e88b30761fae22'
+    city2_url = f'http://api.openweathermap.org/data/2.5/forecast?q={city2}&units=imperial&APPID=a177cd96746098695c1234fa679d306c'
     req = requests.get(url=city2_url)
     city2_json = req.json()
     
+   
+
     """Filtering the returned data to send limited data to the client"""
     city_data=[]
     city2_data=[]
     filtered_data=[]
+
+    #Collecting data with gap of 24 hours in the for loops, the API returns 5 days of data with
+    # gap of 3 hours. This gives us 5 datasets for 5 days for each city
     index = 0
     for item in city_json['list']:
-      print(index%8)
       if index%8 == 0:
         city_data.append(item)
       else:
         pass
       index=index+1
-      print("\n")
+      
     
     index = 0
     for item in city2_json['list']:
       print(index%8)
       if index%8 == 0:
-        print(city2_json['list'][index])
         city2_data.append(item)
       else:
         pass
       index=index+1
-      print("\n")
-  
+    
+      
     filtered_data.append(city_data)
     filtered_data.append(city2_data)
-
-
     return json.dumps(filtered_data)
     
-
-@route('/template')
-def get_template():
-    data = {
-        'name' : "Mazhar Ali",
-        'subject' : "Software"
-    }
-    return template('index',context=data)
-
 if __name__ == '__main__':
   run(host='127.0.0.1',port=8000,debug=True,reloader= True)

@@ -40,10 +40,10 @@
 </body>
 
 <script type="text/javascript">
+//Error handling to prevent user from entering empty names and comments in to the databse
 window.onload = function(){
     let form = document.querySelector('form');
     form.onsubmit = function(){
-    console.log("HEllo how are you , i am working now");
     let name = document.querySelector('input[name="name"]').value;
     let comment = document.querySelector('textarea[name="comment"]').value;
     if (name.length <2 || comment.length<2){
