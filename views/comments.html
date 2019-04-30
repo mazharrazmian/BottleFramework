@@ -1,0 +1,64 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>comments</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+<body>
+        <div class="container">
+                <div class="row">
+                  <div class="col-sm-6">
+                        <h1>
+                                Comments Made by others
+                            </h1>
+                            <div class="panel-group">
+                            %for name in context:
+                            <div class="panel panel-default">
+                                    <div class="panel-heading"> <h4>{{name[2]}}</h4></div>
+                                    <div class="panel-body">{{name[1]}}</div>
+                                  </div>
+                            %end
+                        </div>
+                        
+                  </div>
+                  <div class="col-sm-6">
+                      <h2> Enter your name and comment to get published</h2>
+                        <form class="form-group" id="form"  method="POST">
+                            <label for="name" >NAME:</label>
+                            <input class="form-control" type="text" placeholder="Enter your name" name="name">
+                            <label for="comment">Comment</label>
+                            <textarea name="comment" class="form-control" placeholder="Enter the comment"></textarea>
+                            <button class="btn" type="submit"> Submit  </button>
+                        </form>
+                  </div>
+                  </div>
+              </div>
+</body>
+
+<script type="text/javascript">
+window.onload = function(){
+    let form = document.querySelector('form');
+    form.onsubmit = function(){
+    console.log("HEllo how are you , i am working now");
+    let name = document.querySelector('input[name="name"]').value;
+    let comment = document.querySelector('textarea[name="comment"]').value;
+    if (name.length <2 || comment.length<2){
+        alert("Please enter a name and comment more than 2 characters");
+        return false;
+    }
+    else{
+        form.submit();
+    }
+    
+
+
+    return false;
+    }
+
+
+}</script>
+</html>
